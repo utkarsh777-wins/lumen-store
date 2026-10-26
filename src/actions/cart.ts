@@ -1,5 +1,7 @@
 "use server";
 
+import { refresh } from "next/cache";
+
 import { assertStock } from "@/lib/cart-math";
 import { getOrCreateCartId } from "@/lib/cart";
 import { prisma } from "@/lib/db";
@@ -27,6 +29,7 @@ export async function addToCart(_prev: ActionState, formData: FormData): Promise
   } else {
     await prisma.cartItem.create({ data: { cartId, variantId, quantity: nextQuantity } });
   }
+  refresh();
   return { ok: true, message: `${variant.product.name} added to your bag.` };
 }
 
@@ -41,17 +44,21 @@ export async function updateCartItem(formData: FormData) {
 
   if (quantity < 1) {
     await prisma.cartItem.delete({ where: { id: item.id } });
+    refresh();
     return;
   }
   const allowed = Math.min(quantity, item.variant.stock);
   if (allowed < 1) {
     await prisma.cartItem.delete({ where: { id: item.id } });
+    refresh();
     return;
   }
   await prisma.cartItem.update({ where: { id: item.id }, data: { quantity: allowed } });
+  refresh();
 }
 
 export async function removeCartItem(formData: FormData) {
   const itemId = String(formData.get("itemId") ?? "");
   await prisma.cartItem.deleteMany({ where: { id: itemId } });
+  refresh();
 }
