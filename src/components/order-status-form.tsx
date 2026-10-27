@@ -7,11 +7,12 @@ import { ORDER_STATUSES } from "@/lib/constants";
 
 export function OrderStatusForm({ id, status }: { id: string; status: string }) {
   const [state, action, pending] = useActionState(updateOrderStatus, null);
-  const [value, setValue] = useState(status);
-  const [synced, setSynced] = useState(status);
-  if (status !== synced) {
-    setSynced(status);
-    setValue(status);
+  const confirmed = state?.ok && state.status ? state.status : status;
+  const [value, setValue] = useState(confirmed);
+  const [baseline, setBaseline] = useState(confirmed);
+  if (confirmed !== baseline) {
+    setBaseline(confirmed);
+    setValue(confirmed);
   }
 
   return (

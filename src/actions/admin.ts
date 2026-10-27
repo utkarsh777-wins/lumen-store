@@ -1,6 +1,6 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { getSession } from "@/lib/auth";
@@ -9,7 +9,7 @@ import { prisma } from "@/lib/db";
 import { dollarsToCents } from "@/lib/money";
 import { slugify } from "@/lib/slug";
 
-type AdminResult = { ok: true; message?: string } | { ok: false; error: string };
+type AdminResult = { ok: true; message?: string; status?: string } | { ok: false; error: string };
 
 async function requireAdmin(): Promise<AdminResult | null> {
   const session = await getSession();
@@ -235,7 +235,7 @@ export async function updateOrderStatus(_prev: AdminResult | null, formData: For
   }
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } });
   if (!order) return { ok: false, error: "Order not found." };
-  if (order.status === status) return { ok: true, message: "Status unchanged." };
+  if (order.status === status) return { ok: true, message: "Status unchanged.", status };
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -273,5 +273,6 @@ export async function updateOrderStatus(_prev: AdminResult | null, formData: For
   }
 
   updateTag("catalog");
-  return { ok: true, message: "Order updated." };
+  refresh();
+  return { ok: true, message: "Order updated.", status };
 }
