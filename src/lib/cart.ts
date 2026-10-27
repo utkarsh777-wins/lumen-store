@@ -90,12 +90,13 @@ export async function getCart(): Promise<CartView | null> {
 
 export async function getOrCreateCartId() {
   const store = await cookies();
+  const token = store.get(COOKIE.session)?.value;
   const session = await getSession();
+  if (token && !session) store.delete(COOKIE.session);
   if (session) {
     await attachCartToUser(session.sub);
     const cart = await prisma.cart.findUnique({ where: { userId: session.sub } });
-    if (!cart) throw new Error("Cart could not be created.");
-    return cart.id;
+    if (cart) return cart.id;
   }
 
   const existingId = store.get(COOKIE.cart)?.value;
@@ -109,6 +110,8 @@ export async function getOrCreateCartId() {
 }
 
 export async function attachCartToUser(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  if (!user) return;
   const store = await cookies();
   const guestId = store.get(COOKIE.cart)?.value;
   let userCart = await prisma.cart.findUnique({ where: { userId }, include: { items: true } });

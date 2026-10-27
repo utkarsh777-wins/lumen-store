@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { getAuthSecret } from "@/lib/auth-secret";
 import { COOKIE } from "@/lib/constants";
 import { baseCookie } from "@/lib/cookies";
+import { prisma } from "@/lib/db";
 import type { SessionUser } from "@/lib/types";
 
 function key() {
@@ -40,7 +41,19 @@ export async function getSession(): Promise<SessionUser | null> {
   const store = await cookies();
   const token = store.get(COOKIE.session)?.value;
   if (!token) return null;
-  return readSessionToken(token);
+  const session = await readSessionToken(token);
+  if (!session) return null;
+  const user = await prisma.user.findUnique({
+    where: { id: session.sub },
+    select: { id: true, email: true, name: true, role: true },
+  });
+  if (!user) return null;
+  return {
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role === "ADMIN" ? "ADMIN" : "CUSTOMER",
+  };
 }
 
 export async function setSession(user: SessionUser) {
