@@ -45,6 +45,7 @@ async function Overview() {
       .reduce((sum, order) => sum + order.totalCents, 0);
     return { key, label: day.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), cents };
   });
+  const quietWeek = series.every((day) => day.cents === 0);
   const max = Math.max(...series.map((day) => day.cents), 1);
 
   const units = new Map<string, number>();
@@ -56,28 +57,52 @@ async function Overview() {
   const top = [...units.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-4 sm:space-y-10">
       <div>
-        <h1 className="font-serif text-4xl">Overview</h1>
+        <h1 className="font-serif text-3xl sm:text-4xl">Overview</h1>
         <p className="mt-2 text-sm text-muted">Paid orders only. Cancelled orders are excluded.</p>
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <Stat label="Revenue" value={formatMoney(revenue)} />
         <Stat label="Paid orders" value={String(paid.length)} />
         <Stat label="Average order" value={formatMoney(average)} />
       </div>
       <section>
-        <h2 className="font-serif text-2xl">Last 7 days</h2>
-        <div className="mt-4 flex h-40 items-end gap-3">
-          {series.map((day) => (
-            <div key={day.key} className="flex flex-1 flex-col items-center gap-2">
-              <div className="flex w-full flex-1 items-end">
-                <div className="w-full bg-accent" style={{ height: `${Math.max(4, (day.cents / max) * 100)}%` }} />
-              </div>
-              <span className="text-xs text-muted">{day.label}</span>
+        <h2 className="font-serif text-2xl max-sm:text-xl">Last 7 days</h2>
+        {quietWeek ? (
+          <div className="mt-4 flex min-h-40 flex-col justify-center border border-dashed border-line px-5 py-6 sm:min-h-48">
+            <h3 className="font-medium">No paid orders in the last 7 days.</h3>
+            <p className="mt-2 max-w-md text-sm text-muted">
+              Paid revenue will appear here once an order is marked paid. Cancelled orders stay excluded.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <div
+              className="desk-plot border-b border-line"
+              role="img"
+              aria-label={series.map((day) => `${day.label} ${formatMoney(day.cents)}`).join(", ")}
+            >
+              {series.map((day) => {
+                const height = day.cents <= 0 ? undefined : Math.max(8, Math.round((day.cents / max) * 168));
+                return (
+                  <div key={day.key} className="desk-col">
+                    <div className={day.cents <= 0 ? "desk-bar is-zero" : "desk-bar"} style={height ? { height } : undefined}>
+                      {day.cents > 0 ? <span className="desk-bar-label">{formatMoney(day.cents)}</span> : null}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+            <div className="mt-1.5 flex gap-1">
+              {series.map((day) => (
+                <span key={day.key} className="flex-1 text-center text-[11px] text-muted sm:text-xs">
+                  {day.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
       <div className="grid gap-8 lg:grid-cols-2">
         <section>
@@ -89,11 +114,11 @@ async function Overview() {
           </div>
           <ul className="mt-4 divide-y divide-line border-y border-line text-sm">
             {recent.map((order) => (
-              <li key={order.id} className="flex items-center justify-between py-3">
+              <li key={order.id} className="grid grid-cols-[auto_1fr_auto] items-center gap-3 py-3">
                 <Link href={`/admin/orders/${order.id}`} className="underline">
                   {order.number}
                 </Link>
-                <span className="text-muted">{order.status.toLowerCase()}</span>
+                <StatusPill status={order.status} />
                 <span className="tabular-nums">{formatMoney(order.totalCents)}</span>
               </li>
             ))}
@@ -114,7 +139,7 @@ async function Overview() {
                   {variant.product.name}
                   <span className="text-muted"> · {variant.name}</span>
                 </span>
-                <span className="tabular-nums">{variant.stock}</span>
+                <span className={`tabular-nums ${variant.stock === 0 ? "text-danger" : ""}`}>{variant.stock}</span>
               </li>
             ))}
           </ul>
@@ -135,9 +160,20 @@ async function Overview() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-line bg-elev p-5">
-      <p className="text-xs uppercase tracking-[0.16em] text-muted">{label}</p>
-      <p className="mt-2 font-serif text-3xl tabular-nums">{value}</p>
+    <div className="border border-line bg-elev p-2.5 sm:p-5">
+      <p className="text-[10px] uppercase leading-tight tracking-[0.12em] text-muted sm:text-xs sm:tracking-[0.16em]">{label}</p>
+      <p className="mt-1 font-serif text-lg tabular-nums sm:mt-2 sm:text-3xl">{value}</p>
     </div>
   );
+}
+
+function StatusPill({ status }: { status: string }) {
+  const key = status.toLowerCase();
+  const tone =
+    key === "cancelled"
+      ? "border-danger/40 text-danger"
+      : key === "paid" || key === "delivered" || key === "fulfilled"
+        ? "border-ok/40 text-ok"
+        : "border-line text-ink";
+  return <span className={`inline-flex w-fit border px-1.5 py-0.5 text-xs lowercase ${tone}`}>{key}</span>;
 }

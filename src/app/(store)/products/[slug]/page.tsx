@@ -115,6 +115,9 @@ async function ProductDetails({ params }: { params: Promise<{ slug: string }> })
         <section>
           <h2 className="font-serif text-3xl">Reviews</h2>
           {product.reviews.length === 0 ? <p className="mt-4 text-sm text-muted">No reviews yet.</p> : null}
+          {product.reviews.length > 0 && product.reviews.every((review) => review.sample) ? (
+            <p className="mt-3 text-xs uppercase tracking-[0.12em] text-muted">Sample reviews</p>
+          ) : null}
           <ul className="mt-4 space-y-6">
             {product.reviews.map((review) => (
               <li key={review.id}>
@@ -123,6 +126,7 @@ async function ProductDetails({ params }: { params: Promise<{ slug: string }> })
                 <p className="mt-1 text-sm text-muted">{review.body}</p>
                 <p className="mt-2 text-xs text-muted">
                   {review.author} · {new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(new Date(review.createdAt))}
+                  {review.sample ? " · Sample review." : ""}
                 </p>
               </li>
             ))}

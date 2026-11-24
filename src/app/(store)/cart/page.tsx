@@ -6,7 +6,7 @@ import { removeCartItem, updateCartItem } from "@/actions/cart";
 import { Button, Container, EmptyState } from "@/components/ui";
 import { getCart } from "@/lib/cart";
 import { formatMoney } from "@/lib/money";
-import { quoteOrder } from "@/lib/pricing";
+import { FREE_SHIPPING_THRESHOLD_CENTS, quoteOrder } from "@/lib/pricing";
 
 export const metadata = { title: "Bag", robots: { index: false, follow: false } };
 
@@ -60,14 +60,14 @@ async function CartView() {
                 <div className="mt-4 flex items-center gap-4">
                   <form action={updateCartItem} className="inline-flex items-center border border-line">
                     <input type="hidden" name="itemId" value={item.id} />
-                    <button name="quantity" value={item.quantity - 1} className="px-3 py-2" aria-label={`Decrease quantity of ${item.productName}`}>
+                    <button name="quantity" value={item.quantity - 1} className="inline-flex h-11 w-11 items-center justify-center" aria-label={`Decrease quantity of ${item.productName}`}>
                       −
                     </button>
                     <span className="min-w-8 text-center tabular-nums">{item.quantity}</span>
                     <button
                       name="quantity"
                       value={Math.min(item.quantity + 1, item.stock)}
-                      className="px-3 py-2"
+                      className="inline-flex h-11 w-11 items-center justify-center disabled:opacity-40"
                       aria-label={`Increase quantity of ${item.productName}`}
                       disabled={item.quantity >= item.stock}
                     >
@@ -105,6 +105,17 @@ async function CartView() {
             </div>
           </dl>
           <p className="mt-3 text-xs text-muted">Shipping is estimated with standard delivery. You can choose express at checkout.</p>
+          {quote.shippingCents > 0 ? (
+            <div className="mt-4">
+              <p>Add {formatMoney(FREE_SHIPPING_THRESHOLD_CENTS - quote.subtotalCents)} for free standard shipping.</p>
+              <div className="mt-2 h-1 bg-line" aria-hidden="true">
+                <div
+                  className="h-full bg-ok"
+                  style={{ width: `${Math.min(100, (quote.subtotalCents / FREE_SHIPPING_THRESHOLD_CENTS) * 100)}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
           <Button href="/checkout" className="mt-6 w-full">
             Checkout
           </Button>

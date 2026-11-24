@@ -70,6 +70,7 @@ export async function getCatalog(): Promise<CatalogProduct[]> {
           title: review.title,
           body: review.body,
           createdAt: review.createdAt.toISOString(),
+          sample: review.userId == null,
         })),
         colors,
       } satisfies CatalogProduct;
