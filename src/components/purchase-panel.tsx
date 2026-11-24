@@ -133,7 +133,7 @@ export function PurchasePanel({
         <div className="inline-flex items-center border border-line" role="group" aria-label="Quantity">
           <button
             type="button"
-            className="h-11 w-11 text-lg"
+            className="h-11 w-11 text-lg disabled:opacity-40"
             aria-label="Decrease quantity"
             disabled={soldOut || qty <= 1}
             onClick={() => setQty((current) => Math.max(1, current - 1))}
@@ -143,7 +143,7 @@ export function PurchasePanel({
           <span className="min-w-8 text-center tabular-nums">{qty}</span>
           <button
             type="button"
-            className="h-11 w-11 text-lg"
+            className="h-11 w-11 text-lg disabled:opacity-40"
             aria-label="Increase quantity"
             disabled={soldOut || qty >= Math.max(variant.stock, 1)}
             onClick={() => setQty((current) => Math.min(Math.max(variant.stock, 1), current + 1))}

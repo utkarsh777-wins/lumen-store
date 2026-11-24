@@ -155,7 +155,7 @@ export function CheckoutForm({
   return (
     <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
       <div>
-        <ol aria-label="Checkout progress" className="flex flex-wrap items-center text-sm">
+        <ol aria-label="Checkout progress" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm sm:gap-x-0">
           {steps.map((entry, index) => {
             const state = index < stepIndex ? "done" : index === stepIndex ? "current" : "upcoming";
             return (

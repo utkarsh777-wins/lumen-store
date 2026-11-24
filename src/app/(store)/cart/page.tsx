@@ -41,14 +41,14 @@ async function CartView() {
   return (
     <Container className="py-12">
       <h1 className="font-serif text-4xl md:text-5xl">Your bag</h1>
-      <div className="mt-10 grid gap-12 lg:grid-cols-[1.4fr_0.8fr]">
-        <ul className="divide-y divide-line border-y border-line">
+      <div className="mt-10 grid min-w-0 gap-12 lg:grid-cols-[1.4fr_0.8fr]">
+        <ul className="min-w-0 divide-y divide-line border-y border-line">
           {items.map((item) => (
-            <li key={item.id} className="grid grid-cols-[6rem_1fr] gap-4 py-6 sm:grid-cols-[7.5rem_1fr_auto]">
+            <li key={item.id} className="grid min-w-0 grid-cols-[6rem_1fr] gap-4 py-6 sm:grid-cols-[7.5rem_1fr_auto]">
               <Link href={`/products/${item.productSlug}`} className="relative block aspect-[3/4] bg-sand">
                 {item.image ? <Image src={item.image} alt={item.imageAlt} fill sizes="120px" className="object-cover" /> : null}
               </Link>
-              <div>
+              <div className="min-w-0">
                 <Link href={`/products/${item.productSlug}`} className="font-serif text-2xl">
                   {item.productName}
                 </Link>
@@ -57,7 +57,7 @@ async function CartView() {
                 {item.quantity > item.stock ? (
                   <p className="mt-2 text-sm text-danger">Only {item.stock} left. Quantity will be reduced when you update it.</p>
                 ) : null}
-                <div className="mt-4 flex items-center gap-4">
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
                   <form action={updateCartItem} className="inline-flex items-center border border-line">
                     <input type="hidden" name="itemId" value={item.id} />
                     <button name="quantity" value={item.quantity - 1} className="inline-flex h-11 w-11 items-center justify-center" aria-label={`Decrease quantity of ${item.productName}`}>
