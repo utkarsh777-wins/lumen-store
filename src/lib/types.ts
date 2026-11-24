@@ -18,6 +18,8 @@ export type CatalogReview = {
   title: string;
   body: string;
   createdAt: string;
+  /** Seeded copy has no account. Shopper reviews written in the app do. */
+  sample: boolean;
 };
 
 export type CatalogProduct = CatalogQueryItem & {

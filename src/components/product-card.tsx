@@ -5,7 +5,7 @@ import { WishlistButton } from "@/components/wishlist-button";
 import { Badge, Price } from "@/components/ui";
 import type { CatalogProduct } from "@/lib/types";
 
-export function ProductCard({ product }: { product: CatalogProduct }) {
+export function ProductCard({ product, frame = "portrait" }: { product: CatalogProduct; frame?: "portrait" | "editorial" }) {
   const prices = product.variants.map((variant) => variant.priceCents);
   const min = Math.min(...prices);
   const max = Math.max(...prices);
@@ -15,14 +15,14 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   return (
     <article className="group relative">
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="relative aspect-[3/4] overflow-hidden bg-sand">
+        <div className={`relative overflow-hidden bg-sand ${frame === "editorial" ? "aspect-[3/2]" : "aspect-[3/4]"}`}>
           {image ? (
             <Image
               src={image.url}
               alt=""
               fill
               sizes="(min-width: 1024px) 25vw, 50vw"
-              className="object-cover transition duration-700 group-hover:scale-[1.03]"
+              className="object-cover media-zoom"
             />
           ) : null}
           {hover ? (
@@ -31,7 +31,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               alt=""
               fill
               sizes="(min-width: 1024px) 25vw, 50vw"
-              className="object-cover opacity-0 transition duration-700 group-hover:opacity-100"
+              className="object-cover opacity-0 media-zoom group-hover:opacity-100"
             />
           ) : null}
           <div className="absolute left-3 top-3 flex flex-col gap-2">

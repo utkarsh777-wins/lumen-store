@@ -18,14 +18,29 @@ export function Gallery({ images, name }: { images: { url: string; alt: string }
             aria-label={`Show photo ${index + 1}`}
             aria-current={index === active}
             onClick={() => setActive(index)}
-            className={`relative h-16 w-16 overflow-hidden border ${index === active ? "border-ink" : "border-transparent"}`}
+            className={`relative h-[4.5rem] w-[4.5rem] overflow-hidden border ${index === active ? "border-ink" : "border-transparent"}`}
           >
-            <Image src={item.url} alt="" fill sizes="64px" className="object-cover" />
+            <Image
+              src={item.url}
+              alt=""
+              fill
+              sizes="72px"
+              className="object-cover"
+              style={item.url.includes("cer-4") ? { objectPosition: "20% 80%" } : undefined}
+            />
           </button>
         ))}
       </div>
       <div className="relative order-1 aspect-[4/5] overflow-hidden bg-sand lg:order-2">
-        <Image src={image.url} alt={image.alt} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+        <Image
+          src={image.url}
+          alt={image.alt}
+          fill
+          priority
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="object-cover"
+          style={image.url.includes("cer-4") ? { objectPosition: "20% 80%" } : undefined}
+        />
       </div>
     </div>
   );

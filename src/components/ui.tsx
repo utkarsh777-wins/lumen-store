@@ -30,7 +30,7 @@ export function Button({
   className?: string;
 }) {
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 px-5 py-3 text-sm tracking-wide transition disabled:cursor-not-allowed disabled:opacity-45",
+    "inline-flex min-h-11 items-center justify-center gap-2 px-5 py-3 text-sm tracking-wide transition disabled:cursor-not-allowed disabled:opacity-45",
     buttonStyles[variant],
     className,
   );

@@ -155,22 +155,37 @@ export function CheckoutForm({
   return (
     <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
       <div>
-        <ol aria-label="Checkout progress" className="flex flex-wrap gap-4 text-sm">
-          {steps.map((entry, index) => (
-            <li key={entry.id}>
-              <button
-                type="button"
-                disabled={index > stepIndex}
-                aria-current={entry.id === step ? "step" : undefined}
-                className={entry.id === step ? "underline" : "text-muted disabled:opacity-50"}
-                onClick={() => {
-                  if (index < stepIndex) setStep(entry.id);
-                }}
-              >
-                {index + 1}. {entry.label}
-              </button>
-            </li>
-          ))}
+        <ol aria-label="Checkout progress" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm sm:gap-x-0">
+          {steps.map((entry, index) => {
+            const state = index < stepIndex ? "done" : index === stepIndex ? "current" : "upcoming";
+            return (
+              <li key={entry.id} className="flex items-center">
+                <button
+                  type="button"
+                  disabled={index > stepIndex}
+                  aria-current={entry.id === step ? "step" : undefined}
+                  className={`inline-flex min-h-11 items-center gap-2 disabled:opacity-100 ${state === "upcoming" ? "text-muted" : "text-ink"} ${state === "current" ? "font-medium" : ""}`}
+                  onClick={() => {
+                    if (index < stepIndex) setStep(entry.id);
+                  }}
+                >
+                  <span
+                    className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-xs tabular-nums ${
+                      state === "done"
+                        ? "border-ink bg-ink text-bg"
+                        : state === "current"
+                          ? "border-ink text-ink"
+                          : "border-line text-muted"
+                    }`}
+                  >
+                    {index + 1}
+                  </span>
+                  {entry.label}
+                </button>
+                {index < steps.length - 1 ? <span aria-hidden="true" className="mx-2 hidden h-px w-6 bg-line sm:block" /> : null}
+              </li>
+            );
+          })}
         </ol>
 
         {error ? (
@@ -240,8 +255,8 @@ export function CheckoutForm({
                 <TextField label="Name on card" name="cardName" autoComplete="cc-name" value={card.name} error={fields.cardName} onChange={(value) => setCard((current) => ({ ...current, name: value }))} />
                 <TextField label="Card number" name="cardNumber" autoComplete="cc-number" inputMode="numeric" value={card.number} error={fields.cardNumber} onChange={(value) => setCard((current) => ({ ...current, number: value }))} />
                 <div className="grid grid-cols-2 gap-4">
-                  <TextField label="Expiry" name="cardExp" autoComplete="cc-exp" placeholder="MM/YY" value={card.exp} error={fields.cardExp} onChange={(value) => setCard((current) => ({ ...current, exp: value }))} />
-                  <TextField label="CVC" name="cardCvc" autoComplete="cc-csc" inputMode="numeric" value={card.cvc} error={fields.cardCvc} onChange={(value) => setCard((current) => ({ ...current, cvc: value }))} />
+                  <TextField className="min-w-0" label="Expiry" name="cardExp" autoComplete="cc-exp" placeholder="MM/YY" value={card.exp} error={fields.cardExp} onChange={(value) => setCard((current) => ({ ...current, exp: value }))} />
+                  <TextField className="min-w-0" label="CVC" name="cardCvc" autoComplete="cc-csc" inputMode="numeric" value={card.cvc} error={fields.cardCvc} onChange={(value) => setCard((current) => ({ ...current, cvc: value }))} />
                 </div>
               </div>
             ) : (
@@ -287,16 +302,16 @@ export function CheckoutForm({
 
         <div className="mt-8 flex gap-3">
           {stepIndex > 0 ? (
-            <button type="button" className="border border-ink px-5 py-3 text-sm" onClick={() => setStep(steps[stepIndex - 1].id)}>
+            <button type="button" className="min-h-11 border border-ink px-5 text-sm" onClick={() => setStep(steps[stepIndex - 1].id)}>
               Back
             </button>
           ) : null}
           {step !== "review" ? (
-            <button type="button" className="bg-ink px-5 py-3 text-sm text-bg" onClick={goNext}>
+            <button type="button" className="min-h-11 bg-ink px-5 text-sm text-bg" onClick={goNext}>
               Continue
             </button>
           ) : (
-            <button type="button" disabled={pending} className="bg-ink px-5 py-3 text-sm text-bg disabled:opacity-50" onClick={submit}>
+            <button type="button" disabled={pending} className="min-h-11 bg-ink px-5 text-sm text-bg disabled:opacity-50" onClick={submit}>
               {pending ? "Placing order" : `Place order · ${formatMoney(quote.totalCents)}`}
             </button>
           )}
