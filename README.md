@@ -156,3 +156,15 @@ A Postgres (or other Prisma-supported) database is the usual next step for more 
 - Dark mode follows the system theme and can be toggled from the header. The choice is stored by `next-themes`.
 - `/sitemap.xml` lists the home page, shop, collections, products, and the static stories. `/robots.txt` asks crawlers to skip account, admin, bag, wishlist, and checkout.
 - Product and collection routes are prerendered from the catalog. Pages that read cookies render their dynamic sections inside Suspense.
+
+## License
+
+Lumen Store is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
+
+Copyright © 2026 Utkarsh Kumar. 
+
+This project is a full-stack e-commerce application currently intended for development, demonstration, and educational purposes. It is not an operational commercial storefront.
+
+Third-party libraries, dependencies, and assets remain subject to their respective licenses.
+
+See the [LICENSE](LICENSE) file for full licensing terms.
